@@ -208,8 +208,31 @@ export default function Home() {
           >
             We build digital experiences that
             <br />
-            <span style={{ color: GOLD_LIGHT }}>move businesses forward.</span>
+            <span style={{
+              background: `linear-gradient(
+                90deg,
+                #2a2a2a 0%,
+                #555555 20%,
+                #ffffff 40%,
+                #555555 60%,
+                #2a2a2a 80%,
+                #555555 100%
+              )`,
+              backgroundSize: '300% 100%',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              animation: 'metallicBlackShimmer 3.5s ease-in-out infinite',
+              fontWeight: 600,
+            }}>move businesses forward.</span>
           </motion.p>
+
+          <style>{`
+            @keyframes metallicBlackShimmer {
+              0% { background-position: 100% 50%; }
+              100% { background-position: -100% 50%; }
+            }
+          `}</style>
 
           {/* Scroll indicator */}
           <motion.div
