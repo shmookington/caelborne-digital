@@ -1,12 +1,16 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const ADMIN_EMAIL = 'amiritate03@gmail.com';
 
 export async function POST(request: Request) {
     try {
+        if (!process.env.RESEND_API_KEY) {
+            console.warn('RESEND_API_KEY not set — skipping email');
+            return NextResponse.json({ success: true, skipped: true });
+        }
+
+        const resend = new Resend(process.env.RESEND_API_KEY);
         const body = await request.json();
         const { name, email, phone, businessType, summary, source } = body;
 
