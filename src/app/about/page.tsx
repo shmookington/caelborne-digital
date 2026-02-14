@@ -8,10 +8,10 @@ import Link from 'next/link';
 
 // ─── Design Tokens ──────────────────────────────────────────────
 
-const GOLD = '#8B7332';
-const GOLD_LIGHT = '#BFA265';
-const GOLD_DIM = 'rgba(139, 115, 50, 0.2)';
-const GOLD_BORDER = 'rgba(139, 115, 50, 0.35)';
+const GOLD = '#C5A044';
+const GOLD_LIGHT = '#DAC06A';
+const GOLD_DIM = 'rgba(197, 160, 68, 0.15)';
+const GOLD_BORDER = 'rgba(197, 160, 68, 0.3)';
 const GLASS_BG = 'rgba(12, 12, 20, 0.55)';
 const GLASS_BORDER = 'rgba(255, 255, 255, 0.06)';
 const GLASS_HIGHLIGHT = 'rgba(255, 255, 255, 0.03)';
@@ -37,7 +37,7 @@ export default function AboutPage() {
         <>
             <CosmicBackground />
 
-            <div className="min-h-screen text-white relative">
+            <div className="min-h-screen text-white relative" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                 {/* ═══════════════════════════════════════════════
                     HERO — We're Caelborne
                 ═══════════════════════════════════════════════ */}
@@ -58,12 +58,12 @@ export default function AboutPage() {
                             gap: '8px',
                             padding: '8px 20px',
                             borderRadius: '100px',
-                            background: GOLD_DIM,
-                            border: `1px solid ${GOLD_BORDER}`,
+                            background: 'rgba(12, 12, 20, 0.6)',
+                            border: '1px solid rgba(255,255,255,0.15)',
                             marginBottom: '40px',
                             fontSize: '11px',
                             fontWeight: 600,
-                            color: GOLD,
+                            color: '#fff',
                             letterSpacing: '0.12em',
                             textTransform: 'uppercase',
                         }}
@@ -87,10 +87,7 @@ export default function AboutPage() {
                         We&apos;re{' '}
                         <span
                             style={{
-                                background: `linear-gradient(90deg, ${GOLD_LIGHT}, ${GOLD}, ${GOLD_LIGHT})`,
-                                backgroundSize: '200% 100%',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
+                                color: GOLD_LIGHT,
                                 animation: 'aboutShimmer 4s ease-in-out infinite',
                             }}
                         >
@@ -99,8 +96,8 @@ export default function AboutPage() {
                         <style dangerouslySetInnerHTML={{
                             __html: `
                             @keyframes aboutShimmer {
-                                0% { background-position: -200% center; }
-                                100% { background-position: 200% center; }
+                                0%, 100% { filter: brightness(1); }
+                                50% { filter: brightness(1.4); }
                             }
                             @keyframes processLine {
                                 0% { transform: scaleX(0); }
@@ -141,7 +138,7 @@ export default function AboutPage() {
                         <p style={{
                             fontSize: '11px',
                             fontWeight: 600,
-                            color: GOLD,
+                            color: '#2a2a2a',
                             letterSpacing: '0.15em',
                             textTransform: 'uppercase',
                             marginBottom: '14px',
@@ -211,7 +208,7 @@ export default function AboutPage() {
                                 <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px', letterSpacing: '-0.02em' }}>
                                     {item.title}
                                 </h3>
-                                <p style={{ fontSize: '13px', lineHeight: 1.6, color: '#B0B8C4' }}>
+                                <p style={{ fontSize: '13px', lineHeight: 1.6, color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                                     {item.desc}
                                 </p>
                             </motion.div>
@@ -417,7 +414,7 @@ export default function AboutPage() {
                         <p style={{
                             fontSize: '11px',
                             fontWeight: 600,
-                            color: GOLD,
+                            color: '#2a2a2a',
                             letterSpacing: '0.15em',
                             textTransform: 'uppercase',
                             marginBottom: '16px',
@@ -534,7 +531,7 @@ export default function AboutPage() {
                         </h2>
                         <p style={{
                             fontSize: '15px',
-                            color: '#B0B8C4',
+                            color: '#fff',
                             marginBottom: '32px',
                             maxWidth: '400px',
                             margin: '0 auto 32px',

@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Outfit } from 'next/font/google';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { User, Menu, X, Wallet, Compass, Globe, LogOut, UserCircle, Store, ArrowRight, Info } from 'lucide-react';
+import { User, Menu, X, Wallet, Compass, Globe, LogOut, UserCircle, Store, ArrowRight, Info, Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { isAdmin } from '@/lib/isAdmin';
 
 const outfit = Outfit({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
 
@@ -59,7 +60,7 @@ function CTAButton({ mobile = false }: { mobile?: boolean }) {
 
     return (
         <Link
-            href="/business"
+            href="/business/start"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             style={{
@@ -169,26 +170,28 @@ export default function GlobalNav() {
                 }}
             >
                 {/* ── Logo ──────────────────────────────────── */}
-                <Link href="/" style={{
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    textDecoration: 'none',
-                    gap: '8px',
-                }}>
-                    <span
-                        style={{
-                            fontSize: '16px',
-                            fontWeight: 700,
-                            letterSpacing: '-0.03em',
-                            background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 100%)`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                        }}
-                    >
-                        Caelborne
-                    </span>
-                </Link>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                    <Link href="/" style={{
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        textDecoration: 'none',
+                        gap: '8px',
+                    }}>
+                        <span
+                            style={{
+                                fontSize: '16px',
+                                fontWeight: 700,
+                                letterSpacing: '-0.03em',
+                                background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 100%)`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                            }}
+                        >
+                            Caelborne
+                        </span>
+                    </Link>
+                </div>
 
                 {/* ── Center Links ──────────────────────────── */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
@@ -203,8 +206,8 @@ export default function GlobalNav() {
                 </div>
 
                 {/* ── Right Side: CTA + Account ────────────── */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-                    <CTAButton />
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'flex-end' }}>
+                    {!user && <CTAButton />}
 
                     {/* Account Icon with Dropdown */}
                     <div
@@ -240,23 +243,25 @@ export default function GlobalNav() {
                             <Link
                                 href="/signin"
                                 style={{
-                                    color: 'rgba(245, 245, 247, 0.7)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '8px',
-                                    borderRadius: '50%',
+                                    color: 'rgba(245, 245, 247, 0.8)',
+                                    fontSize: '13px',
+                                    fontWeight: 500,
+                                    textDecoration: 'none',
+                                    padding: '6px 14px',
+                                    borderRadius: '8px',
                                     transition: 'all 0.25s ease',
+                                    letterSpacing: '-0.01em',
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.color = '#fff';
                                     e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = 'rgba(245, 245, 247, 0.7)';
+                                    e.currentTarget.style.color = 'rgba(245, 245, 247, 0.8)';
                                     e.currentTarget.style.background = 'none';
                                 }}
                             >
-                                <User size={16} strokeWidth={1.5} />
+                                Sign In
                             </Link>
                         )}
 
@@ -274,10 +279,17 @@ export default function GlobalNav() {
                                     borderRadius: '14px',
                                     border: '1px solid rgba(255, 255, 255, 0.08)',
                                     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
-                                    overflow: 'hidden',
                                     animation: 'navDropdownIn 0.2s ease-out',
                                 }}
                             >
+                                {/* Invisible bridge covering the gap between icon and dropdown */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    right: 0,
+                                    width: '100%',
+                                    height: '12px',
+                                }} />
                                 {/* Gold accent bar */}
                                 <div
                                     style={{
@@ -305,7 +317,10 @@ export default function GlobalNav() {
                                 <div style={{ padding: '6px 0' }}>
                                     {[
                                         { href: '/account', label: 'My Account', icon: UserCircle },
-                                        { href: '/dashboard', label: 'Business Dashboard', icon: Store },
+                                        ...(isAdmin(user?.email)
+                                            ? [{ href: '/admin', label: 'Admin Panel', icon: Shield }]
+                                            : [{ href: '/dashboard', label: 'Business Dashboard', icon: Store }]
+                                        ),
                                     ].map((item) => (
                                         <Link
                                             key={item.href}
@@ -498,10 +513,111 @@ export default function GlobalNav() {
                         </Link>
                     ))}
 
-                    {/* Sign out for logged-in users */}
+                    {/* Role-aware account links for logged-in users */}
                     {user && (
                         <>
                             <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '8px 0' }} />
+
+                            {/* My Account */}
+                            <Link
+                                href="/account"
+                                onClick={() => setMobileMenuOpen(false)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '16px',
+                                    padding: '16px 24px',
+                                    fontSize: '17px',
+                                    fontWeight: isActive('/account') ? 600 : 400,
+                                    color: isActive('/account') ? '#fff' : 'rgba(255, 255, 255, 0.85)',
+                                    textDecoration: 'none',
+                                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                                    transition: 'all 0.2s ease',
+                                }}
+                            >
+                                <UserCircle size={20} strokeWidth={1.5} style={{
+                                    color: isActive('/account') ? GOLD : 'rgba(201,169,110,0.6)',
+                                }} />
+                                My Account
+                                {isActive('/account') && (
+                                    <span style={{
+                                        marginLeft: 'auto',
+                                        width: '5px',
+                                        height: '5px',
+                                        borderRadius: '50%',
+                                        background: GOLD,
+                                    }} />
+                                )}
+                            </Link>
+
+                            {/* Admin Panel or Business Dashboard */}
+                            {isAdmin(user?.email) ? (
+                                <Link
+                                    href="/admin"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '16px',
+                                        padding: '16px 24px',
+                                        fontSize: '17px',
+                                        fontWeight: isActive('/admin') ? 600 : 400,
+                                        color: isActive('/admin') ? '#fff' : 'rgba(255, 255, 255, 0.85)',
+                                        textDecoration: 'none',
+                                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <Shield size={20} strokeWidth={1.5} style={{
+                                        color: isActive('/admin') ? GOLD : 'rgba(201,169,110,0.6)',
+                                    }} />
+                                    Admin Panel
+                                    {isActive('/admin') && (
+                                        <span style={{
+                                            marginLeft: 'auto',
+                                            width: '5px',
+                                            height: '5px',
+                                            borderRadius: '50%',
+                                            background: GOLD,
+                                        }} />
+                                    )}
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="/dashboard"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '16px',
+                                        padding: '16px 24px',
+                                        fontSize: '17px',
+                                        fontWeight: isActive('/dashboard') ? 600 : 400,
+                                        color: isActive('/dashboard') ? '#fff' : 'rgba(255, 255, 255, 0.85)',
+                                        textDecoration: 'none',
+                                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <Store size={20} strokeWidth={1.5} style={{
+                                        color: isActive('/dashboard') ? GOLD : 'rgba(201,169,110,0.6)',
+                                    }} />
+                                    Business Dashboard
+                                    {isActive('/dashboard') && (
+                                        <span style={{
+                                            marginLeft: 'auto',
+                                            width: '5px',
+                                            height: '5px',
+                                            borderRadius: '50%',
+                                            background: GOLD,
+                                        }} />
+                                    )}
+                                </Link>
+                            )}
+
+                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '8px 0' }} />
+
+                            {/* Sign Out */}
                             <button
                                 onClick={handleSignOut}
                                 style={{
@@ -531,7 +647,7 @@ export default function GlobalNav() {
                     padding: '20px 24px 40px',
                     borderTop: '1px solid rgba(255,255,255,0.06)',
                 }}>
-                    <CTAButton mobile />
+                    {!user && <CTAButton mobile />}
                 </div>
             </div>
         </nav>

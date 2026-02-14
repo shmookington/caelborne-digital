@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import { isAdmin } from '@/lib/isAdmin';
 import { ArrowLeft, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -30,7 +31,7 @@ export default function SignInPage() {
         setLoading(true);
         setError('');
 
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
@@ -39,7 +40,7 @@ export default function SignInPage() {
             setError(error.message);
             setLoading(false);
         } else {
-            router.push('/wallet');
+            router.push(isAdmin(data.user?.email) ? '/admin' : '/dashboard');
         }
     };
 

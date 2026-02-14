@@ -17,7 +17,7 @@ const GOLD = '#8B7332';
 const GOLD_LIGHT = '#BFA265';
 const GOLD_DIM = 'rgba(139, 115, 50, 0.2)';
 const GOLD_BORDER = 'rgba(139, 115, 50, 0.35)';
-const GLASS_BG = 'rgba(12, 12, 20, 0.55)';
+const GLASS_BG = 'rgba(12, 12, 20, 0.82)';
 const GLASS_BORDER = 'rgba(255, 255, 255, 0.06)';
 
 const PURPLE = '#a855f7';
@@ -91,7 +91,12 @@ export default function GuapProductPage() {
                 {/* ═══════════════════════════════════════
                     HERO
                 ═══════════════════════════════════════ */}
-                <section style={{ padding: '80px 24px 60px', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+                <section style={{
+                    padding: '80px 24px 60px',
+                    textAlign: 'center',
+                    maxWidth: '800px',
+                    margin: '0 auto',
+                }}>
                     {/* Badge */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -145,10 +150,11 @@ export default function GuapProductPage() {
                         transition={{ delay: 0.2, duration: 0.5 }}
                         style={{
                             fontSize: 'clamp(16px, 2.5vw, 20px)',
-                            color: '#B0B8C4',
+                            color: '#D8DCE3',
                             lineHeight: 1.6,
                             maxWidth: '560px',
                             margin: '0 auto 40px',
+                            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
                         }}
                     >
                         A digital loyalty platform that turns first-time visitors into lifelong customers.
@@ -201,13 +207,14 @@ export default function GuapProductPage() {
                                 gap: '8px',
                                 padding: '14px 28px',
                                 borderRadius: '14px',
-                                background: 'rgba(255,255,255,0.04)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                color: '#B0B8C4',
+                                background: 'rgba(255,255,255,0.08)',
+                                border: '1px solid rgba(255,255,255,0.18)',
+                                color: '#fff',
                                 fontSize: '14px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
+                                textShadow: '0 1px 4px rgba(0,0,0,0.4)',
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
@@ -278,7 +285,7 @@ export default function GuapProductPage() {
                         </h3>
                         <p style={{
                             fontSize: '14px',
-                            color: '#B0B8C4',
+                            color: '#fff',
                             lineHeight: 1.6,
                             maxWidth: '380px',
                             margin: '0 auto',
@@ -385,7 +392,7 @@ export default function GuapProductPage() {
                                     (e.currentTarget as HTMLElement).style.borderColor = GLASS_BORDER;
                                 }}
                             >
-                                <feat.icon size={22} style={{ color: PURPLE, marginBottom: '14px', opacity: 0.8 }} />
+                                <feat.icon size={22} style={{ color: PURPLE, marginBottom: '14px', opacity: 1 }} />
                                 <h3 style={{
                                     fontSize: '15px',
                                     fontWeight: 700,
@@ -397,7 +404,7 @@ export default function GuapProductPage() {
                                 </h3>
                                 <p style={{
                                     fontSize: '13px',
-                                    color: '#B0B8C4',
+                                    color: '#D8DCE3',
                                     lineHeight: 1.55,
                                 }}>
                                     {feat.desc}
@@ -469,7 +476,7 @@ export default function GuapProductPage() {
 
                             <p style={{
                                 fontSize: '15px',
-                                color: '#B0B8C4',
+                                color: '#D8DCE3',
                                 lineHeight: 1.65,
                                 marginBottom: '28px',
                                 maxWidth: '500px',
@@ -491,7 +498,7 @@ export default function GuapProductPage() {
                                         style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                                     >
                                         <Star size={14} style={{ color: GOLD, flexShrink: 0 }} />
-                                        <span style={{ fontSize: '13px', color: '#B0B8C4', fontWeight: 500 }}>
+                                        <span style={{ fontSize: '13px', color: '#D8DCE3', fontWeight: 500 }}>
                                             {item}
                                         </span>
                                     </div>
@@ -540,6 +547,11 @@ export default function GuapProductPage() {
                     textAlign: 'center',
                     maxWidth: '600px',
                     margin: '0 auto',
+                    background: 'rgba(12, 12, 20, 0.75)',
+                    backdropFilter: 'blur(30px)',
+                    WebkitBackdropFilter: 'blur(30px)',
+                    borderRadius: '24px',
+                    border: `1px solid ${GLASS_BORDER}`,
                 }}>
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -568,7 +580,7 @@ export default function GuapProductPage() {
                         </h2>
                         <p style={{
                             fontSize: '15px',
-                            color: '#B0B8C4',
+                            color: '#D8DCE3',
                             lineHeight: 1.6,
                             marginBottom: '28px',
                         }}>
@@ -576,7 +588,7 @@ export default function GuapProductPage() {
                             Guap is the easiest way to launch a loyalty program.
                         </p>
                         <Link
-                            href="/guap/contact"
+                            href="/business/start"
                             style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',

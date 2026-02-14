@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import GlobalNav from '@/components/GlobalNav';
@@ -256,11 +257,10 @@ export default function CaelbornePage() {
         return () => { document.head.removeChild(style); };
     }, []);
 
+    const router = useRouter();
+
     const handleBookConsultation = () => {
-        setShowConsultation(true);
-        setTimeout(() => {
-            consultRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        router.push('/business/start');
     };
 
     const handleSubmitConsultation = () => {
@@ -274,7 +274,7 @@ export default function CaelbornePage() {
             <CosmicBackground />
             <GlobalNav />
 
-            <div style={{ minHeight: '100vh', paddingTop: '44px', color: '#fff', position: 'relative' }}>
+            <div style={{ minHeight: '100vh', paddingTop: '44px', color: '#fff', position: 'relative', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
 
                 {/* ═══════════════════════════════════════════════════
                     HERO SECTION
@@ -306,12 +306,12 @@ export default function CaelbornePage() {
                             gap: '10px',
                             padding: '10px 24px',
                             borderRadius: '100px',
-                            background: GOLD_DIM,
-                            border: `1px solid ${GOLD_BORDER}`,
+                            background: 'rgba(12, 12, 20, 0.6)',
+                            border: '1px solid rgba(255,255,255,0.15)',
                             marginBottom: '40px',
                             fontSize: '13px',
                             fontWeight: 600,
-                            color: GOLD,
+                            color: '#fff',
                             letterSpacing: '0.06em',
                         }}
                     >
@@ -345,7 +345,7 @@ export default function CaelbornePage() {
                             fontSize: 'clamp(16px, 2.5vw, 22px)',
                             fontWeight: 400,
                             lineHeight: 1.5,
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            color: '#fff',
                             maxWidth: '560px',
                             marginBottom: '16px',
                             letterSpacing: '-0.01em',
@@ -375,7 +375,7 @@ export default function CaelbornePage() {
                         style={{
                             fontSize: 'clamp(13px, 1.8vw, 15px)',
                             lineHeight: 1.8,
-                            color: 'rgba(255, 255, 255, 0.55)',
+                            color: '#fff',
                             maxWidth: '480px',
                             marginBottom: '48px',
                         }}
@@ -707,7 +707,7 @@ export default function CaelbornePage() {
                                     <span style={{
                                         fontSize: '11px',
                                         fontWeight: 700,
-                                        color: 'rgba(255, 255, 255, 0.2)',
+                                        color: 'rgba(255, 255, 255, 0.5)',
                                         textTransform: 'uppercase',
                                         letterSpacing: '0.1em',
                                     }}>
@@ -727,7 +727,8 @@ export default function CaelbornePage() {
                                     <p style={{
                                         fontSize: '14px',
                                         lineHeight: 1.6,
-                                        color: 'rgba(255, 255, 255, 0.65)',
+                                        color: '#fff',
+                                        textShadow: '0 2px 8px rgba(0,0,0,0.5)',
                                     }}>
                                         {step.desc}
                                     </p>
@@ -1246,7 +1247,8 @@ export default function CaelbornePage() {
                             <p style={{
                                 fontSize: '15px',
                                 lineHeight: 1.7,
-                                color: 'rgba(255, 255, 255, 0.65)',
+                                color: '#fff',
+                                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
                                 marginBottom: '36px',
                             }}>
                                 Every great digital presence starts with a conversation.

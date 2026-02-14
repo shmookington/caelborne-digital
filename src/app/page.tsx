@@ -127,12 +127,34 @@ export default function Home() {
               letterSpacing: '-0.05em',
               textAlign: 'center',
               marginBottom: '16px',
-              color: '#ffffff',
-              textShadow: '0 2px 20px rgba(0,0,0,0.5), 0 0 60px rgba(0,0,0,0.3)',
+              background: `linear-gradient(
+                90deg,
+                #A08030 0%,
+                #ffffff 18%,
+                #D4B86A 36%,
+                #ffffff 50%,
+                #C5A044 65%,
+                #ffffff 82%,
+                #A08030 100%
+              )`,
+              backgroundSize: '200% 100%',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              animation: 'caelborneShimmer 4s ease-in-out infinite',
+              filter: 'drop-shadow(0 0 30px rgba(197, 160, 68, 0.5)) drop-shadow(0 4px 24px rgba(139, 115, 50, 0.4))',
             }}
           >
             Caelborne
           </motion.h1>
+
+          {/* Keyframe injection for shimmer */}
+          <style>{`
+            @keyframes caelborneShimmer {
+              0% { background-position: 100% 50%; }
+              100% { background-position: -100% 50%; }
+            }
+          `}</style>
 
           {/* Animated sweeping gold underline */}
           <motion.div
@@ -459,8 +481,9 @@ export default function Home() {
             }} />
             <p style={{
               fontSize: '15px',
-              color: '#B0B8C4',
+              color: '#fff',
               marginBottom: '24px',
+              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             }}>
               Ready to start a project?
             </p>

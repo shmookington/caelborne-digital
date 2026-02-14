@@ -1,9 +1,13 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download, Clock, CheckCircle2, AlertCircle, Shield, Bookmark, Receipt } from 'lucide-react';
+import { FileText, Download, Clock, CheckCircle2, AlertCircle, Shield, Bookmark, Receipt, Loader, FolderOpen } from 'lucide-react';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import DashboardNav from '@/components/DashboardNav';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 // ─── Design Tokens ──────────────────────────────────────────────
@@ -15,50 +19,7 @@ const GOLD_BORDER = 'rgba(139, 115, 50, 0.35)';
 const GLASS_BG = 'rgba(12, 12, 20, 0.55)';
 const GLASS_BORDER = 'rgba(255, 255, 255, 0.06)';
 
-// ─── Mock Documents ─────────────────────────────────────────────
-
-const DOCUMENTS = [
-    {
-        title: 'Service Agreement',
-        description: 'Master service agreement covering project scope, terms, and deliverables.',
-        date: 'Jan 12, 2026',
-        status: 'signed' as const,
-        icon: Shield,
-        type: 'Contract',
-    },
-    {
-        title: 'Project Proposal',
-        description: 'Detailed scope breakdown with itemized pricing and timeline.',
-        date: 'Jan 10, 2026',
-        status: 'signed' as const,
-        icon: FileText,
-        type: 'Proposal',
-    },
-    {
-        title: 'Invoice #001',
-        description: 'Initial deposit — 50% of total project cost.',
-        date: 'Jan 15, 2026',
-        status: 'paid' as const,
-        icon: Receipt,
-        type: 'Invoice',
-    },
-    {
-        title: 'Brand Guidelines',
-        description: 'Color palette, typography, logo usage, and visual standards.',
-        date: 'Jan 22, 2026',
-        status: 'draft' as const,
-        icon: Bookmark,
-        type: 'Design',
-    },
-    {
-        title: 'Invoice #002',
-        description: 'Milestone payment — Design phase completion.',
-        date: 'Feb 18, 2026',
-        status: 'pending' as const,
-        icon: Receipt,
-        type: 'Invoice',
-    },
-];
+// ─── Status Config (display config, not per-client data) ────────
 
 const STATUS_CONFIG = {
     signed: { label: 'Signed', color: '#34d399', bg: 'rgba(52, 211, 153, 0.1)', icon: CheckCircle2 },
@@ -67,9 +28,137 @@ const STATUS_CONFIG = {
     draft: { label: 'Draft', color: '#8E95A0', bg: 'rgba(255,255,255,0.04)', icon: AlertCircle },
 };
 
+const DOC_TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; style?: React.CSSProperties }>> = {
+    Contract: Shield,
+    Proposal: FileText,
+    Invoice: Receipt,
+    Design: Bookmark,
+};
+
+// ─── Types ──────────────────────────────────────────────────────
+
+interface Document {
+    id: string;
+    title: string;
+    description: string | null;
+    date: string | null;
+    status: 'signed' | 'paid' | 'pending' | 'draft';
+    doc_type: string | null;
+    file_url: string | null;
+}
+
+// ─── Helpers ────────────────────────────────────────────────────
+
+function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '—';
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 // ─── Page ───────────────────────────────────────────────────────
 
 export default function DocumentsPage() {
+    const router = useRouter();
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function load() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { router.push('/signin'); return; }
+
+            // Get user's project first
+            const { data: projects } = await supabase
+                .from('projects')
+                .select('id')
+                .eq('user_id', user.id)
+                .limit(1);
+
+            if (projects && projects.length > 0) {
+                const { data: docs } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .eq('project_id', projects[0].id)
+                    .order('date', { ascending: false });
+
+                if (docs) setDocuments(docs as Document[]);
+            }
+
+            setLoading(false);
+        }
+        load();
+    }, [router]);
+
+    // ─── Loading ────────────────────────────────────────────────
+
+    if (loading) {
+        return (
+            <>
+                <CosmicBackground />
+                <DashboardNav />
+                <div className="min-h-screen relative z-10" style={{ paddingTop: '104px' }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: '60vh',
+                        gap: '16px',
+                    }}>
+                        <Loader size={28} style={{ color: GOLD, animation: 'spin 1s linear infinite' }} />
+                        <p style={{ fontSize: '14px', color: '#8E95A0' }}>Loading documents…</p>
+                    </div>
+                </div>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </>
+        );
+    }
+
+    // ─── Empty ──────────────────────────────────────────────────
+
+    if (documents.length === 0) {
+        return (
+            <>
+                <CosmicBackground />
+                <DashboardNav />
+                <div className="min-h-screen relative z-10" style={{ paddingTop: '104px' }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: '60vh',
+                        gap: '16px',
+                        padding: '24px',
+                        textAlign: 'center',
+                    }}>
+                        <FolderOpen size={40} style={{ color: GOLD, opacity: 0.6 }} />
+                        <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#fff' }}>No Documents Yet</h2>
+                        <p style={{ fontSize: '14px', color: '#8E95A0', maxWidth: '360px', lineHeight: 1.6 }}>
+                            Your contracts, invoices, and project files will appear here as they&apos;re created.
+                        </p>
+                        <Link
+                            href="/dashboard"
+                            style={{
+                                marginTop: '12px',
+                                padding: '12px 28px',
+                                borderRadius: '100px',
+                                background: `linear-gradient(135deg, ${GOLD}, ${GOLD_LIGHT})`,
+                                color: '#fff',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                textDecoration: 'none',
+                            }}
+                        >
+                            Back to Dashboard
+                        </Link>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    // ─── Main ───────────────────────────────────────────────────
+
     return (
         <>
             <CosmicBackground />
@@ -102,9 +191,9 @@ export default function DocumentsPage() {
                 {/* ── Summary Stats ──────────────────── */}
                 <div style={{ padding: '0 24px 28px', display: 'flex', gap: '10px' }}>
                     {[
-                        { label: 'Total', value: DOCUMENTS.length.toString(), color: '#B0B8C4' },
-                        { label: 'Signed', value: DOCUMENTS.filter(d => d.status === 'signed').length.toString(), color: '#34d399' },
-                        { label: 'Pending', value: DOCUMENTS.filter(d => d.status === 'pending').length.toString(), color: '#fbbf24' },
+                        { label: 'Total', value: documents.length.toString(), color: '#B0B8C4' },
+                        { label: 'Signed', value: documents.filter(d => d.status === 'signed').length.toString(), color: '#34d399' },
+                        { label: 'Pending', value: documents.filter(d => d.status === 'pending').length.toString(), color: '#fbbf24' },
                     ].map((stat, i) => (
                         <motion.div
                             key={stat.label}
@@ -133,13 +222,14 @@ export default function DocumentsPage() {
                 {/* ── Documents List ─────────────────── */}
                 <div style={{ padding: '0 24px 60px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {DOCUMENTS.map((doc, i) => {
-                            const statusCfg = STATUS_CONFIG[doc.status];
+                        {documents.map((doc, i) => {
+                            const statusCfg = STATUS_CONFIG[doc.status] || STATUS_CONFIG.draft;
                             const StatusIcon = statusCfg.icon;
+                            const DocIcon = (doc.doc_type && DOC_TYPE_ICONS[doc.doc_type]) || FileText;
 
                             return (
                                 <motion.div
-                                    key={doc.title + i}
+                                    key={doc.id}
                                     initial={{ opacity: 0, y: 14 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.2 + i * 0.06, duration: 0.4 }}
@@ -173,7 +263,7 @@ export default function DocumentsPage() {
                                             justifyContent: 'center',
                                             flexShrink: 0,
                                         }}>
-                                            <doc.icon size={18} style={{ color: GOLD }} />
+                                            <DocIcon size={18} style={{ color: GOLD }} />
                                         </div>
 
                                         {/* Content */}
@@ -195,7 +285,7 @@ export default function DocumentsPage() {
                                                         textTransform: 'uppercase',
                                                         letterSpacing: '0.06em',
                                                     }}>
-                                                        {doc.type}
+                                                        {doc.doc_type || 'Document'}
                                                     </span>
                                                 </div>
 
@@ -221,14 +311,16 @@ export default function DocumentsPage() {
                                                 </span>
                                             </div>
 
-                                            <p style={{
-                                                fontSize: '12px',
-                                                color: '#8E95A0',
-                                                lineHeight: 1.5,
-                                                marginTop: '6px',
-                                            }}>
-                                                {doc.description}
-                                            </p>
+                                            {doc.description && (
+                                                <p style={{
+                                                    fontSize: '12px',
+                                                    color: '#8E95A0',
+                                                    lineHeight: 1.5,
+                                                    marginTop: '6px',
+                                                }}>
+                                                    {doc.description}
+                                                </p>
+                                            )}
 
                                             <div style={{
                                                 display: 'flex',
@@ -240,26 +332,50 @@ export default function DocumentsPage() {
                                                     fontSize: '11px',
                                                     color: '#8E95A0',
                                                 }}>
-                                                    {doc.date}
+                                                    {formatDate(doc.date)}
                                                 </span>
 
-                                                <button style={{
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center',
-                                                    gap: '6px',
-                                                    padding: '6px 14px',
-                                                    borderRadius: '8px',
-                                                    background: 'rgba(255,255,255,0.04)',
-                                                    border: '1px solid rgba(255,255,255,0.08)',
-                                                    color: '#B0B8C4',
-                                                    fontSize: '11px',
-                                                    fontWeight: 500,
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.2s ease',
-                                                }}>
-                                                    <Download size={12} />
-                                                    Download
-                                                </button>
+                                                {doc.file_url ? (
+                                                    <a
+                                                        href={doc.file_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '6px',
+                                                            padding: '6px 14px',
+                                                            borderRadius: '8px',
+                                                            background: 'rgba(255,255,255,0.04)',
+                                                            border: '1px solid rgba(255,255,255,0.08)',
+                                                            color: '#B0B8C4',
+                                                            fontSize: '11px',
+                                                            fontWeight: 500,
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s ease',
+                                                            textDecoration: 'none',
+                                                        }}
+                                                    >
+                                                        <Download size={12} />
+                                                        Download
+                                                    </a>
+                                                ) : (
+                                                    <span style={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        padding: '6px 14px',
+                                                        borderRadius: '8px',
+                                                        background: 'rgba(255,255,255,0.02)',
+                                                        border: '1px solid rgba(255,255,255,0.04)',
+                                                        color: '#5A5F6A',
+                                                        fontSize: '11px',
+                                                        fontWeight: 500,
+                                                    }}>
+                                                        <Download size={12} />
+                                                        No File
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
