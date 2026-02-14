@@ -211,26 +211,29 @@ export default function Home() {
             <span style={{
               background: `linear-gradient(
                 90deg,
-                #2a2a2a 0%,
-                #555555 20%,
-                #ffffff 40%,
-                #555555 60%,
-                #2a2a2a 80%,
-                #555555 100%
+                #3a3a3a 0%,
+                #3a3a3a 40%,
+                #6a6a6a 44%,
+                #c8c8c8 48%,
+                #f0f0f0 50%,
+                #c8c8c8 52%,
+                #6a6a6a 56%,
+                #3a3a3a 60%,
+                #3a3a3a 100%
               )`,
-              backgroundSize: '300% 100%',
+              backgroundSize: '250% 100%',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              animation: 'metallicBlackShimmer 3.5s ease-in-out infinite',
+              animation: 'metallicBlackShimmer 4s linear infinite',
               fontWeight: 600,
             }}>move businesses forward.</span>
           </motion.p>
 
           <style>{`
             @keyframes metallicBlackShimmer {
-              0% { background-position: 100% 50%; }
-              100% { background-position: -100% 50%; }
+              0% { background-position: 200% 50%; }
+              100% { background-position: -50% 50%; }
             }
           `}</style>
 
